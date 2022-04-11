@@ -1,9 +1,9 @@
 ### Function to simulate traits with causative markers for GWAS 
 
-# variant of the sim_Y script using gamma-distributed (instead of normally distributed) noise
-# new parameter is shape
+# variant of the sim_Y script using pearson-distributed (instead of normally distributed) noise
+# new parameters are skew and kurt (for skewness and kurtosis)
 
-sim_Y_gamma <-
+sim_Y_pearson <-
   function(n = 100,
            acc = A,
            sp_acc = 0,
@@ -17,7 +17,8 @@ sim_Y_gamma <-
            seed = 42,
            bk = 1000,
            effect_factor = 1,
-           shape = 1
+           skew = 0,
+           kurt = 3
           ) {
     stopifnot(no_snps > 0)
     stopifnot(length(ve) == no_snps)
@@ -62,7 +63,7 @@ sim_Y_gamma <-
       dat <- var(sim[, 2])
       
       h_2 <- dat / h2 - dat
-      fix1 <- rgamma(nrow(back), shape=shape, scale=sqrt(h_2/shape))
+      fix1 <- rpearson(nrow(back),moments=c(mean=0,variance=h_2,skewness=skew,kurtosis=kurt))
       sim_ <-
         data.frame(ecot_id = as.integer(rownames(back)), value = first + fix1)
       
